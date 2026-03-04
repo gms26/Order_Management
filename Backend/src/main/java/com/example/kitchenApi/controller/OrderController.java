@@ -18,8 +18,14 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/orders")
-    public void createOrder(@RequestBody OrderRequest request) {
-        orderService.createOrder(request);
+    public org.springframework.http.ResponseEntity<?> createOrder(@RequestBody OrderRequest request) {
+        try {
+            orderService.createOrder(request);
+            return org.springframework.http.ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return org.springframework.http.ResponseEntity.badRequest()
+                    .body(java.util.Collections.singletonMap("message", e.getMessage()));
+        }
     }
 
     @GetMapping("/orders")
@@ -29,7 +35,7 @@ public class OrderController {
 
     @PutMapping("/orders/{id}/status")
     public void updateStatus(@PathVariable UUID id,
-                             @RequestBody Map<String, String> body) {
+            @RequestBody Map<String, String> body) {
         orderService.updateStatus(id, body.get("status"));
     }
 }

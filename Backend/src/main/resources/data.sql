@@ -1,0 +1,10 @@
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Margherita Pizza', 299, 20);
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Pepperoni Pizza', 349, 15);
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Classic Burger', 199, 25);
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Cheese Burger', 249, 20);
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Pasta Alfredo', 279, 18);
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Penne Arrabbiata', 259, 15);
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Caesar Salad', 179, 30);
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Fresh Orange Juice', 99, 50);
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Cold Coffee', 129, 40);
+INSERT INTO MENU_ITEM (name, price, stock) VALUES ('Chocolate Shake', 149, 35);

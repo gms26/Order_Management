@@ -37,11 +37,19 @@ public class OrderService {
         for (OrderItemRequest itemReq : request.getItems()) {
 
             MenuItem menuItem = menuRepo.findById(itemReq.getItemId())
-                    .orElseThrow();
+                    .orElseThrow(() -> new RuntimeException("Menu item not found: " + itemReq.getItemId()));
+
+            if (menuItem.getStock() < itemReq.getQuantity()) {
+                throw new RuntimeException("Insufficient stock for: " + menuItem.getName());
+            }
 
             double itemPrice = menuItem.getPrice() * itemReq.getQuantity();
 
             total += itemPrice;
+
+            // Deduct stock
+            menuItem.setStock(menuItem.getStock() - itemReq.getQuantity());
+            menuRepo.save(menuItem);
         }
 
         order.setTotalPrice(total);
@@ -69,8 +77,7 @@ public class OrderService {
 
     public List<Order> getAllOrdersSorted() {
         return orderRepo.findAll(
-                Sort.by(Sort.Direction.DESC, "priorityScore")
-        );
+                Sort.by(Sort.Direction.DESC, "priorityScore"));
     }
 
     public void updateStatus(UUID id, String status) {

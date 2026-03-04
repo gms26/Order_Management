@@ -33,20 +33,12 @@ function KitchenDashboard() {
     }
   };
 
-  const getStatusBadgeStyle = (status) => {
-    const base = {
-      padding: "0.25rem 0.75rem",
-      borderRadius: "9999px",
-      fontSize: "0.75rem",
-      fontWeight: "700",
-      textTransform: "uppercase"
-    };
-
-    if (status === "PENDING") return { ...base, background: "rgba(245, 158, 11, 0.1)", color: "#f59e0b", border: "1px solid rgba(245, 158, 11, 0.2)" };
-    if (status === "COOKING") return { ...base, background: "rgba(99, 102, 241, 0.1)", color: "#818cf8", border: "1px solid rgba(99, 102, 241, 0.2)" };
-    if (status === "READY") return { ...base, background: "rgba(16, 185, 129, 0.1)", color: "#10b981", border: "1px solid rgba(16, 185, 129, 0.2)" };
-    if (status === "DELIVERED") return { ...base, background: "rgba(148, 163, 184, 0.1)", color: "#94a3b8", border: "1px solid rgba(148, 163, 184, 0.2)" };
-    return base;
+  const getStatusStyle = (status) => {
+    if (status === "PLACED") return { background: "#fef3c7", color: "#92400e" };
+    if (status === "COOKING") return { background: "#e0e7ff", color: "#3730a3" };
+    if (status === "READY") return { background: "#d1fae5", color: "#065f46" };
+    if (status === "DELIVERED") return { background: "#f1f5f9", color: "#475569" };
+    return { background: "#f1f5f9", color: "#64748b" };
   };
 
   if (loading) {
@@ -63,71 +55,80 @@ function KitchenDashboard() {
   return (
     <div className="container animate-fade-in">
       <div className="flex" style={{ marginBottom: "2rem" }}>
-        <h2>Kitchen Dashboard</h2>
-        <div style={{ background: "rgba(255,255,255,0.05)", padding: "0.5rem 1rem", borderRadius: "0.75rem" }}>
-          <span style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>Live Updates Active</span>
+        <h2 style={{ marginBottom: 0 }}>Kitchen Orders</h2>
+        <span style={{ background: "#d1fae5", color: "#065f46", padding: "0.4rem 1rem", borderRadius: "0.5rem", fontSize: "0.8rem", fontWeight: "600" }}>
+          ● Live
+        </span>
+      </div>
+
+      {orders.length === 0 ? (
+        <div className="card">
+          <h3 style={{ textAlign: "center", color: "var(--text-muted)" }}>No Orders in Queue</h3>
         </div>
-      </div>
-
-      <div className="grid-container">
-        {orders.length === 0 ? (
-          <div className="card" style={{ gridColumn: "1 / -1" }}>
-            <h3 style={{ textAlign: "center", color: "var(--text-muted)" }}>No Orders in Queue</h3>
-          </div>
-        ) : (
-          orders.map((order) => (
-            <div key={order.id} className="card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div>
-                <div className="flex" style={{ marginBottom: "1rem" }}>
-                  <h3 style={{ margin: 0 }}>Order #{order.id}</h3>
-                  <span style={getStatusBadgeStyle(order.status)}>{order.status}</span>
-                </div>
-
-                <div style={{ marginBottom: "1.5rem" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Priority Score</span>
-                    <span style={{ fontWeight: "700", color: order.priorityScore > 50 ? "var(--secondary)" : "var(--accent)" }}>
-                      {order.priorityScore}
-                    </span>
-                  </div>
-                  <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px", overflow: "hidden" }}>
-                    <div style={{ width: `${Math.min(100, order.priorityScore)}%`, height: "100%", background: "var(--primary)" }}></div>
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
-                <button
-                  className="status-btn"
-                  onClick={() => changeStatus(order.id, "COOKING")}
-                  disabled={order.status === "COOKING" || order.status === "READY" || order.status === "DELIVERED"}
-                  style={{ fontSize: "0.8rem", padding: "0.5rem" }}
-                >
-                  Cooking
-                </button>
-
-                <button
-                  className="deliver-btn"
-                  onClick={() => changeStatus(order.id, "READY")}
-                  disabled={order.status === "READY" || order.status === "DELIVERED"}
-                  style={{ fontSize: "0.8rem", padding: "0.5rem" }}
-                >
-                  Ready
-                </button>
-
-                <button
-                  className="logout-btn"
-                  onClick={() => changeStatus(order.id, "DELIVERED")}
-                  disabled={order.status === "DELIVERED"}
-                  style={{ gridColumn: "1 / -1", fontSize: "0.8rem", padding: "0.5rem" }}
-                >
-                  Mark Delivered
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      ) : (
+        <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th style={{ padding: "1rem", textAlign: "left" }}>Order</th>
+                <th style={{ padding: "1rem", textAlign: "left" }}>Status</th>
+                <th style={{ padding: "1rem", textAlign: "left" }}>Priority</th>
+                <th style={{ padding: "1rem", textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => {
+                const statusStyle = getStatusStyle(order.status);
+                return (
+                  <tr key={order.id}>
+                    <td style={{ padding: "1rem", fontWeight: "600" }}>#{order.id?.substring(0, 8)}</td>
+                    <td style={{ padding: "1rem" }}>
+                      <span style={{
+                        ...statusStyle,
+                        padding: "0.25rem 0.75rem",
+                        borderRadius: "0.375rem",
+                        fontSize: "0.75rem",
+                        fontWeight: "700",
+                        textTransform: "uppercase"
+                      }}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: "1rem", fontWeight: "500" }}>{order.priorityScore?.toFixed(0)}</td>
+                    <td style={{ padding: "0.75rem 1rem", textAlign: "right" }}>
+                      <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+                        <button
+                          className="status-btn"
+                          onClick={() => changeStatus(order.id, "COOKING")}
+                          disabled={order.status !== "PLACED"}
+                          style={{ fontSize: "0.75rem", padding: "0.35rem 0.75rem" }}
+                        >
+                          Cooking
+                        </button>
+                        <button
+                          className="deliver-btn"
+                          onClick={() => changeStatus(order.id, "READY")}
+                          disabled={order.status !== "COOKING"}
+                          style={{ fontSize: "0.75rem", padding: "0.35rem 0.75rem" }}
+                        >
+                          Ready
+                        </button>
+                        <button
+                          onClick={() => changeStatus(order.id, "DELIVERED")}
+                          disabled={order.status === "DELIVERED"}
+                          style={{ fontSize: "0.75rem", padding: "0.35rem 0.75rem", background: order.status === "DELIVERED" ? "#e2e8f0" : "#6366f1" }}
+                        >
+                          Delivered
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
